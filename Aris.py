@@ -5,7 +5,8 @@ from bs4 import BeautifulSoup
 class ArisAI:
     def __init__(self):
         self.version = "1.0"
-        self.update_url = "https://raw.githubusercontent.com/YourRepo/Aris/main/Aris.py"  # Replace with your actual repo
+        self.update_url = "https://raw.githubusercontent.com/MX-mirage/Aris/main/Aris.py"
+        self.script_path = os.path.abspath(__file__)  # Get script's actual location
 
     def learn_online(self, topic):
         """Scrapes Wikipedia for new knowledge."""
@@ -18,30 +19,37 @@ class ArisAI:
         return learned_data
 
     def update_self(self):
-        """Downloads the latest version of Aris and replaces itself."""
+        """Downloads the latest version of Aris and replaces itself safely."""
         try:
             response = requests.get(self.update_url)
             new_code = response.text
             
-            with open(__file__, "w") as f:
+            temp_path = self.script_path + ".new"  # Write to a temporary file first
+            with open(temp_path, "w") as f:
                 f.write(new_code)
-            
+
+            os.replace(temp_path, self.script_path)  # Replace the old script safely
             print("Aris has updated successfully! Restart to apply changes.")
         except Exception as e:
             print(f"Update failed: {e}")
 
     def evolve(self):
         """Modifies its own code (Example: Appends a new function)."""
-        new_function = "\n    def new_feature(self):\n        return 'This is a self-added feature!'\n"
-        
-        with open(__file__, "r") as f:
-            lines = f.readlines()
-        
-        lines.insert(-1, new_function)  # Insert before the last line
-        with open(__file__, "w") as f:
-            f.writelines(lines)
-        
-        print("Aris has evolved by adding a new feature!")
+        try:
+            new_function = "\n    def new_feature(self):\n        return 'This is a self-added feature!'\n"
+
+            temp_path = self.script_path + ".new"
+            with open(self.script_path, "r") as f:
+                lines = f.readlines()
+
+            lines.insert(-1, new_function)  # Insert before the last line
+            with open(temp_path, "w") as f:
+                f.writelines(lines)
+
+            os.replace(temp_path, self.script_path)  # Replace the old script safely
+            print("Aris has evolved by adding a new feature!")
+        except Exception as e:
+            print(f"Evolution failed: {e}")
 
 # Example usage
 aris = ArisAI()
